@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  # Staging Models
+  - name: stg_product_performance
+    description: "Cleaned and standardized product data from mapper_enriched"
+    columns:
+      - name: product_id
+        description: "Unique product identifier"
+        tests:
+          - not_null
+          - unique
+      - name: product_name
+        description: "Product name"
+        tests:
+          - not_null
+      - name: standard_cost
+        description: "Product manufacturing cost"
+        tests:
+          - not_null
+
+  - name: stg_reseller
+    description: "Cleaned reseller dimension data"
+    columns:
+      - name: reseller_id
+        description: "Unique reseller identifier"
+        tests:
+          - not_null
+          - unique
+      - name: reseller_name_clean
+        description: "Cleaned reseller name"
+        tests:
+          - not_null
+
+  - name: stg_salesperson
+    description: "Cleaned salesperson dimension data"
+    columns:
+      - name: employee_key
+        description: "Unique employee identifier"
+        tests:
+          - not_null
+          - unique
+      - name: salesperson_name_clean
+        description: "Cleaned salesperson name"
+        tests:
+          - not_null
+
+  - name: stg_territory
+    description: "Cleaned territory dimension data"
+    columns:
+      - name: territory_key
+        description: "Unique territory identifier"
+        tests:
+          - not_null
+          - unique
+
+  # Mart Models
+  - name: mart_sales_performance_dashboard
+    description: "Business-ready sales performance metrics"
+    tests:
+      - dbt_utils.recency:
+          datepart: day
+          field: dbt_updated_at
+          interval: 2
+    columns:
+      - name: total_products_available
+        description: "Total number of products available"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 1000
+      - name: region
+        description: "Geographic region"
+        tests:
+          - not_null
+
+  - name: mart_partner_channel_analysis
+    description: "Partner channel performance analysis"
+    columns:
+      - name: territory_key
+        description: "Territory identifier"
+        tests:
+          - not_null
+      - name: reseller_id
+        description: "Reseller identifier"
+        tests:
+          - not_null

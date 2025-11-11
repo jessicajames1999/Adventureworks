@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: raw_adventureworks
+    description: "Raw AdventureWorks data from BigQuery"
+    database: chicory-mds
+    schema: raw_adventureworks
+    tables:
+      - name: dim_reseller
+        description: "Reseller dimension table"
+      - name: dim_salesperson
+        description: "Salesperson dimension table"  
+      - name: dim_region
+        description: "Region dimension table"
+
+  - name: mapper_enriched
+    description: "Enriched and mapped data from raw sources"
+    database: chicory-mds
+    schema: mapper_enriched
+    tables:
+      - name: product_performance_mapper
+        description: "Product performance data with enrichments"

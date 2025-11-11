@@ -1,0 +1,227 @@
+name: Chicory AI Mapping
+
+on:
+  # 1️⃣ Triggered automatically by Airflow's repository_dispatch event
+  repository_dispatch:
+    types: [chicory-mapping]
+  # 2️⃣ Triggered manually from GitHub UI or CLI
+  workflow_dispatch:
+    inputs:
+      text:
+        description: "Raw text or CSV sample to send to Chicory Agent"
+        required: true
+        type: string
+      bucket:
+        description: "Optional bucket name for context"
+        required: false
+        type: string
+        default: "demo-bucket"
+      object:
+        description: "Optional object name for context"
+        required: false
+        type: string
+        default: "demo.csv"
+
+env:
+  OUTPUT_PATH: mapping.json
+
+jobs:
+  map-schema:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Resolve input variables
+        id: inputs
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Triggered manually"
+            {
+              echo 'TEXT<<EOF'
+              echo '${{ github.event.inputs.text }}'
+              echo 'EOF'
+            } >> $GITHUB_ENV
+            echo "BUCKET=${{ github.event.inputs.bucket }}" >> $GITHUB_ENV
+            echo "OBJECT=${{ github.event.inputs.object }}" >> $GITHUB_ENV
+          else
+            echo "Triggered via repository_dispatch"
+            {
+              echo 'TEXT<<EOF'
+              echo '${{ github.event.client_payload.text }}'
+              echo 'EOF'
+            } >> $GITHUB_ENV
+            echo "BUCKET=${{ github.event.client_payload.bucket }}" >> $GITHUB_ENV
+            echo "OBJECT=${{ github.event.client_payload.object }}" >> $GITHUB_ENV
+          fi
+
+      - name: Display context
+        run: |
+          echo "Bucket: $BUCKET"
+          echo "Object: $OBJECT"
+          echo "Payload text (first lines):"
+          echo "$TEXT" | head -10
+
+      - name: Send payload text to Chicory Agent
+        id: chicory
+        env:
+          CHICORY_TOKEN: ${{ secrets.CHICORY_MAPPING_API_TOKEN }}
+          CHICORY_PROJECT_ID: ${{ secrets.CHICORY_PROJECT_ID }}
+          CHICORY_AGENT_ID: ${{ secrets.CHICORY_MAPPING_AGENT_ID }}
+        run: |
+          # Validate secrets are set
+          if [ -z "$CHICORY_TOKEN" ]; then
+            echo "ERROR: CHICORY_MAPPING_API_TOKEN secret is not set"
+            exit 1
+          fi
+          if [ -z "$CHICORY_PROJECT_ID" ]; then
+            echo "ERROR: CHICORY_PROJECT_ID secret is not set"
+            exit 1
+          fi
+          if [ -z "$CHICORY_AGENT_ID" ]; then
+            echo "ERROR: CHICORY_MAPPING_AGENT_ID secret is not set"
+            exit 1
+          fi
+
+          echo "DEBUG: Secrets are set (token length: ${#CHICORY_TOKEN}, project_id length: ${#CHICORY_PROJECT_ID}, agent_id length: ${#CHICORY_AGENT_ID})"
+
+          # Validate token format (should start with alphanumeric, no quotes or spaces)
+          if [[ "$CHICORY_TOKEN" =~ [[:space:]] ]]; then
+            echo "ERROR: CHICORY_TOKEN contains whitespace"
+            exit 1
+          fi
+          if [[ "$CHICORY_TOKEN" =~ ^[\'\"] ]] || [[ "$CHICORY_TOKEN" =~ [\'\"]$ ]]; then
+            echo "ERROR: CHICORY_TOKEN contains quotes"
+            exit 1
+          fi
+
+          CONTENT=$(cat <<'EOF'
+          ultrathink - Analyze the provided source schema and generate a comprehensive mapping to a target data warehouse schema.
+
+          OUTPUT FORMAT:
+          **STRICTLY** return a JSON mapping only. No additional text.
+
+          ===
+
+          EOF
+          )
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+
+          # Create request payload
+          PAYLOAD=$(jq -n \
+            --arg agent_name "$CHICORY_AGENT_ID" \
+            --arg content "$CONTENT\n\nBucket: $BUCKET\n\nObject: $OBJECT\n\n===\n\nInput Schema Sample:\n$TEXT" \
+            --arg created_at "$CURRENT_TIME" \
+            '{
+              "agent_name": $agent_name,
+              "input": [
+                {
+                  "parts": [
+                    {
+                      "content_type": "text/plain",
+                      "content": $content
+                    }
+                  ],
+                  "created_at": $created_at
+                }
+              ]
+            }')
+          
+          echo "DEBUG: Payload created"
+          echo "DEBUG: Sending request to: https://app.chicory.ai/api/v1/runs/project/$CHICORY_PROJECT_ID"
+
+          # Create async run with verbose output
+          CREATE_RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "https://app.chicory.ai/api/v1/runs/project/$CHICORY_PROJECT_ID" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $CHICORY_TOKEN" \
+            -d "$PAYLOAD")
+
+          # Extract HTTP code
+          HTTP_CODE=$(echo "$CREATE_RESPONSE" | grep "HTTP_CODE:" | cut -d: -f2)
+          CREATE_RESPONSE=$(echo "$CREATE_RESPONSE" | sed '/HTTP_CODE:/d')
+
+          echo "DEBUG: HTTP Status Code: $HTTP_CODE"
+          echo "DEBUG: Create response: $CREATE_RESPONSE"
+
+          # Check HTTP status
+          if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "201" ]; then
+            echo "ERROR: API request failed with HTTP $HTTP_CODE"
+            if [ "$HTTP_CODE" = "403" ]; then
+              echo "ERROR: Authentication failed. Please verify:"
+              echo "  1. CHICORY_MAPPING_API_TOKEN is correct and not expired"
+              echo "  2. Token has permission to access project $CHICORY_PROJECT_ID"
+              echo "  3. Project ID $CHICORY_PROJECT_ID is correct"
+            fi
+            echo "Response: $CREATE_RESPONSE"
+            exit 1
+          fi
+
+          # Extract run_id
+          RUN_ID=$(echo "$CREATE_RESPONSE" | jq -r '.run_id')
+
+          if [ "$RUN_ID" = "null" ] || [ -z "$RUN_ID" ]; then
+            echo "ERROR: Failed to extract run_id from response"
+            echo "Response: $CREATE_RESPONSE"
+            exit 1
+          fi
+          
+          echo "DEBUG: Created run with ID: $RUN_ID"
+          
+          # Poll for completion
+          MAX_ATTEMPTS=60  # 5 minutes with 5-second intervals
+          ATTEMPT=0
+          
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            echo "DEBUG: Polling attempt $((ATTEMPT + 1))/$MAX_ATTEMPTS"
+
+            STATUS_RESPONSE=$(curl -s -X GET "https://app.chicory.ai/api/v1/runs/$RUN_ID/project/$CHICORY_PROJECT_ID" \
+              -H "Authorization: Bearer $CHICORY_TOKEN")
+            
+            echo "DEBUG: Status response: $STATUS_RESPONSE"
+            
+            STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.status')
+            echo "DEBUG: Current status: $STATUS"
+            
+            if [ "$STATUS" = "completed" ]; then
+              echo "$STATUS_RESPONSE" | jq -r '.output[0].parts[0].content' > $OUTPUT_PATH
+              echo "Mapping output saved to $OUTPUT_PATH"
+              exit 0
+              
+            elif [ "$STATUS" = "failed" ] || [ "$STATUS" = "error" ]; then
+              echo "DEBUG: Run failed with status: $STATUS"
+              echo "Run failed with status: $STATUS" > analysis_result.txt
+              exit 1
+              
+            elif [ "$STATUS" = "in-progress" ] || [ "$STATUS" = "created" ]; then
+              echo "DEBUG: Run still in progress, waiting..."
+              sleep 5
+              ATTEMPT=$((ATTEMPT + 1))
+              
+            else
+              echo "DEBUG: Unknown status: $STATUS"
+              sleep 5
+              ATTEMPT=$((ATTEMPT + 1))
+            fi
+          done
+          
+          # If we get here, we timed out
+          echo "DEBUG: Timed out waiting for completion"
+          echo "Analysis timed out after 5 minutes" > analysis_result.txt
+      - name: Create PR with mapping.json
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.CHICORY_GITHUB_TOKEN }}
+          branch: mapping-${{ github.event_name == 'workflow_dispatch' && github.run_number }}
+          commit-message: "Add mapping.json for ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.object || github.event.client_payload.object }}"
+          title: "Mapping for ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.object || github.event.client_payload.object }}"
+          body: |
+            Auto-generated mapping produced by Chicory AI
+            **Bucket:** ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.bucket || github.event.client_payload.bucket }}
+            **Object:** ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.object || github.event.client_payload.object }}
+            **Trigger:** ${{ github.event_name }}
+          base: main
+          delete-branch: true

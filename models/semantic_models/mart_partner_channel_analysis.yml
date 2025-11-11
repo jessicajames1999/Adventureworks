@@ -1,0 +1,171 @@
+semantic_models:
+  - name: mart_partner_channel_analysis
+    description: "Comprehensive channel partner and reseller performance analysis across territories with product portfolio fit metrics"
+    model: ref('mart_partner_channel_analysis')
+
+    defaults:
+      agg_time_dimension: dbt_updated_at
+
+    entities:
+      - name: territory_key
+        type: primary
+        description: "Unique identifier for sales territory"
+
+      - name: reseller_id
+        type: foreign
+        description: "Unique identifier for reseller partner"
+
+    dimensions:
+      - name: region
+        type: categorical
+        description: "Geographic sales region"
+
+      - name: country
+        type: categorical
+        description: "Country name for territory"
+
+      - name: region_group
+        type: categorical
+        description: "High-level regional grouping (e.g., North America, Europe, Pacific)"
+
+      - name: market_classification
+        type: categorical
+        description: "Market tier classification (e.g., Domestic Market, NAFTA Region, European Union)"
+
+      - name: reseller_name
+        type: categorical
+        description: "Name of the reseller partner"
+
+      - name: business_type
+        type: categorical
+        description: "Type of reseller business (e.g., Specialty Bike Shop, Warehouse, Value Added Reseller)"
+
+      - name: reseller_city
+        type: categorical
+        description: "City where reseller is located"
+
+      - name: reseller_state
+        type: categorical
+        description: "State or province where reseller is located"
+
+      - name: retail_category
+        type: categorical
+        description: "Retail channel category (e.g., Specialty Retail, Volume Retail, Value Retail)"
+
+      - name: geographic_tier
+        type: categorical
+        description: "Geographic partnership tier (e.g., Domestic Partner, NAFTA Partner, International Partner)"
+
+      - name: market_classification_detail
+        type: categorical
+        description: "Detailed market classification (e.g., Major Market, Secondary Market, Tertiary Market)"
+
+      - name: market_penetration_potential
+        type: categorical
+        description: "Assessment of market penetration potential (High, Medium, Limited)"
+
+      - name: recommended_strategy
+        type: categorical
+        description: "Recommended channel strategy based on partner and product fit"
+
+      - name: dbt_updated_at
+        type: time
+        description: "Timestamp when record was last updated by dbt"
+        type_params:
+          time_granularity: day
+
+    measures:
+      - name: total_products_in_territory
+        description: "Total count of distinct products available in the territory"
+        agg: sum
+        expr: total_products_in_territory
+
+      - name: total_categories_in_territory
+        description: "Total count of distinct product categories in the territory"
+        agg: sum
+        expr: total_categories_in_territory
+
+      - name: specialty_premium_products
+        description: "Count of premium products suitable for specialty retail channels"
+        agg: sum
+        expr: specialty_premium_products
+
+      - name: warehouse_volume_products
+        description: "Count of standard/budget products suitable for warehouse volume retail"
+        agg: sum
+        expr: warehouse_volume_products
+
+      - name: value_budget_products
+        description: "Count of budget products suitable for value retail channels"
+        agg: sum
+        expr: value_budget_products
+
+      - name: bikes_available
+        description: "Count of bike products available in territory"
+        agg: sum
+        expr: bikes_available
+
+      - name: components_available
+        description: "Count of component products available in territory"
+        agg: sum
+        expr: components_available
+
+      - name: apparel_available
+        description: "Count of apparel products available in territory"
+        agg: sum
+        expr: apparel_available
+
+      - name: accessories_available
+        description: "Count of accessory products available in territory"
+        agg: sum
+        expr: accessories_available
+
+      - name: premium_products
+        description: "Count of premium price tier products"
+        agg: sum
+        expr: premium_products
+
+      - name: midrange_products
+        description: "Count of mid-range price tier products"
+        agg: sum
+        expr: midrange_products
+
+      - name: standard_products
+        description: "Count of standard price tier products"
+        agg: sum
+        expr: standard_products
+
+      - name: budget_products
+        description: "Count of budget price tier products"
+        agg: sum
+        expr: budget_products
+
+      - name: avg_product_cost_in_territory
+        description: "Average product cost across all products in territory"
+        agg: avg
+        expr: avg_product_cost_in_territory
+
+      - name: total_inventory_value_potential
+        description: "Total potential inventory value for all products in territory"
+        agg: sum
+        expr: total_inventory_value_potential
+
+      - name: lowest_price_point
+        description: "Lowest product price point in territory"
+        agg: min
+        expr: lowest_price_point
+
+      - name: highest_price_point
+        description: "Highest product price point in territory"
+        agg: max
+        expr: highest_price_point
+
+      - name: channel_product_fit_score
+        description: "Score indicating how well products fit the channel partner type (0-100 scale)"
+        agg: avg
+        expr: channel_product_fit_score
+
+      - name: territory_competitiveness_score
+        description: "Overall territory competitiveness score based on product availability and market maturity (0-100 scale)"
+        agg: avg
+        expr: territory_competitiveness_score

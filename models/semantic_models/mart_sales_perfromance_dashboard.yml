@@ -1,0 +1,148 @@
+semantic_models:
+  - name: mart_sales_perfromance_dashboard
+    description: "Comprehensive sales performance metrics by territory and salesperson with product portfolio analysis"
+    model: ref('mart_sales_perfromance_dashboard')
+
+    defaults:
+      agg_time_dimension: dbt_updated_at
+
+    entities:
+      - name: territory_key
+        type: foreign
+        description: "Unique identifier for sales territory"
+
+      - name: employee_key
+        type: primary
+        description: "Unique identifier for salesperson employee"
+
+    dimensions:
+      - name: region
+        type: categorical
+        description: "Geographic sales region"
+
+      - name: country
+        type: categorical
+        description: "Country name for territory"
+
+      - name: region_group
+        type: categorical
+        description: "High-level regional grouping (e.g., North America, Europe, Pacific)"
+
+      - name: market_type
+        type: categorical
+        description: "Market type classification (e.g., Domestic, NAFTA, International)"
+
+      - name: regional_priority
+        type: categorical
+        description: "Regional priority tier (High Priority, Medium Priority, Standard Priority)"
+
+      - name: salesperson_name
+        type: categorical
+        description: "Name of the salesperson"
+
+      - name: job_title
+        type: categorical
+        description: "Job title of the salesperson"
+
+      - name: role_level
+        type: categorical
+        description: "Role level classification (Executive, Management, Individual Contributor)"
+
+      - name: territory_scope
+        type: categorical
+        description: "Scope of territory coverage (Regional Coverage, Multi-Territory, Limited Territory, Individual Territory)"
+
+      - name: product_diversity_level
+        type: categorical
+        description: "Level of product diversity (High, Medium, Low Product Diversity)"
+
+      - name: portfolio_positioning
+        type: categorical
+        description: "Portfolio positioning strategy (Premium Portfolio, Mid-Range Portfolio, Value Portfolio)"
+
+      - name: dbt_updated_at
+        type: time
+        description: "Timestamp when record was last updated by dbt"
+        type_params:
+          time_granularity: day
+
+    measures:
+      - name: total_products_available
+        description: "Total count of distinct products available to salesperson in territory"
+        agg: sum
+        expr: total_products_available
+
+      - name: total_categories_available
+        description: "Total count of distinct product categories available"
+        agg: sum
+        expr: total_categories_available
+
+      - name: premium_products_count
+        description: "Count of premium price tier products"
+        agg: sum
+        expr: premium_products_count
+
+      - name: midrange_products_count
+        description: "Count of mid-range price tier products"
+        agg: sum
+        expr: midrange_products_count
+
+      - name: standard_products_count
+        description: "Count of standard price tier products"
+        agg: sum
+        expr: standard_products_count
+
+      - name: budget_products_count
+        description: "Count of budget price tier products"
+        agg: sum
+        expr: budget_products_count
+
+      - name: bikes_count
+        description: "Count of bike products available"
+        agg: sum
+        expr: bikes_count
+
+      - name: components_count
+        description: "Count of component products available"
+        agg: sum
+        expr: components_count
+
+      - name: apparel_count
+        description: "Count of apparel products available"
+        agg: sum
+        expr: apparel_count
+
+      - name: accessories_count
+        description: "Count of accessory products available"
+        agg: sum
+        expr: accessories_count
+
+      - name: avg_product_cost
+        description: "Average product cost across all available products"
+        agg: avg
+        expr: avg_product_cost
+
+      - name: min_product_cost
+        description: "Minimum product cost in available portfolio"
+        agg: min
+        expr: min_product_cost
+
+      - name: max_product_cost
+        description: "Maximum product cost in available portfolio"
+        agg: max
+        expr: max_product_cost
+
+      - name: total_inventory_value
+        description: "Total inventory value for all available products"
+        agg: sum
+        expr: total_inventory_value
+
+      - name: avg_standard_cost
+        description: "Average standard cost of products"
+        agg: avg
+        expr: avg_standard_cost
+
+      - name: market_opportunity_score
+        description: "Overall market opportunity score based on product diversity and market maturity (0-100 scale)"
+        agg: avg
+        expr: market_opportunity_score

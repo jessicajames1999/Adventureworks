@@ -1,4 +1,15 @@
 metrics:
+  # Key Density Metrics
+  - name: reseller_density_per_territory
+    label: "Reseller Density per Territory"
+    description: "Average number of resellers operating per territory. Higher density indicates more competitive markets with multiple distribution channels. Use this to identify saturated vs. underserved markets."
+    type: ratio
+    type_params:
+      numerator:
+        name: reseller_count
+      denominator:
+        name: territory_count
+
   - name: total_products_in_territory
     label: "Total Products in Territory"
     description: "Total count of distinct products available across territories. Use to assess product portfolio breadth and market coverage."

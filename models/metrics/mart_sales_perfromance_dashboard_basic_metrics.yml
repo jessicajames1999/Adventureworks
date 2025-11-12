@@ -110,3 +110,25 @@ metrics:
     type: simple
     type_params:
       measure: market_opportunity_score
+
+  - name: midrange_product_percentage
+    label: "Mid-Range Product Percentage"
+    description: |
+      Percentage of products in the mid-range price tier relative to total products available.
+      
+      Calculation: (midrange_products_count / total_products_available) * 100
+      
+      Interpretation:
+      - Higher percentage indicates stronger mid-market positioning
+      - Use to assess portfolio balance and pricing strategy
+      - Benchmark against market positioning goals
+      
+      Use for:
+      - Evaluating territory product mix strategies
+      - Identifying opportunities to strengthen mid-market presence
+      - Comparing mid-range focus across salespeople and territories
+      - Supporting pricing and product placement decisions
+    type: ratio
+    type_params:
+      numerator: midrange_products_count
+      denominator: total_products_available

@@ -131,3 +131,25 @@ metrics:
     type: simple
     type_params:
       measure: territory_competitiveness_score
+
+  - name: bikes_category_share_territory
+    label: "Bikes Category Share (Territory)"
+    description: |
+      Percentage of bikes within the total product portfolio available in territories.
+      
+      Calculation: bikes_available / total_products_in_territory
+      
+      Interpretation:
+      - Values range from 0.0 to 1.0 (multiply by 100 for percentage)
+      - Higher values indicate bikes dominate the portfolio
+      - Lower values suggest more diversified product mix
+      
+      Use for:
+      - Understanding bikes category weight in territory portfolios
+      - Identifying territories heavily focused on bikes vs. diversified offerings
+      - Channel partner strategy - matching bike-heavy portfolios to specialty bike shops
+      - Portfolio rebalancing decisions across territories
+    type: ratio
+    type_params:
+      numerator: bikes_available
+      denominator: total_products_in_territory

@@ -110,3 +110,25 @@ metrics:
     type: simple
     type_params:
       measure: market_opportunity_score
+
+  - name: bikes_category_share
+    label: "Bikes Category Share"
+    description: |
+      Percentage of bikes within the total product portfolio available to sales teams.
+      
+      Calculation: bikes_count / total_products_available
+      
+      Interpretation:
+      - Values range from 0.0 to 1.0 (multiply by 100 for percentage)
+      - Higher values indicate bikes dominate the sales portfolio
+      - Lower values suggest more diversified product offerings
+      
+      Use for:
+      - Understanding bikes category weight in sales portfolios
+      - Sales team specialization analysis - identifying bike-focused vs. generalist sales teams
+      - Territory product mix evaluation
+      - Sales training prioritization based on portfolio composition
+    type: ratio
+    type_params:
+      numerator: bikes_count
+      denominator: total_products_available

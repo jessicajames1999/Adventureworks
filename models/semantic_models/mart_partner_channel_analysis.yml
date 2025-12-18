@@ -1,6 +1,6 @@
 semantic_models:
-  - name: mart_partner_channel_analysis
-    description: "Comprehensive channel partner and reseller performance analysis across territories with product portfolio fit metrics"
+  - name: partner_channel_analysis
+    description: "Analyzes reseller partner performance across territories, including product-channel fit, market penetration potential, and strategic recommendations for channel optimization."
     model: ref('mart_partner_channel_analysis')
 
     defaults:
@@ -8,164 +8,156 @@ semantic_models:
 
     entities:
       - name: territory_key
-        type: primary
-        description: "Unique identifier for sales territory"
-
-      - name: reseller_id
         type: foreign
-        description: "Unique identifier for reseller partner"
+        description: "Unique identifier for sales territories"
+      - name: reseller_id
+        type: primary
+        description: "Unique identifier for reseller partners"
 
     dimensions:
+      # Territory dimensions
       - name: region
         type: categorical
-        description: "Geographic sales region"
-
+        description: "Geographic region name (e.g., Northwest, Central, Southeast)"
       - name: country
         type: categorical
-        description: "Country name for territory"
-
+        description: "Country where the territory is located"
       - name: region_group
         type: categorical
         description: "High-level regional grouping (e.g., North America, Europe, Pacific)"
-
       - name: market_classification
         type: categorical
-        description: "Market tier classification (e.g., Domestic Market, NAFTA Region, European Union)"
+        description: "Market classification based on geography (Domestic Market, NAFTA Region, European Union, Asia Pacific, Emerging Market)"
 
+      # Reseller dimensions
       - name: reseller_name
         type: categorical
         description: "Name of the reseller partner"
-
       - name: business_type
         type: categorical
-        description: "Type of reseller business (e.g., Specialty Bike Shop, Warehouse, Value Added Reseller)"
-
+        description: "Type of reseller business (e.g., Specialty Bike Shop, Warehouse)"
       - name: reseller_city
         type: categorical
-        description: "City where reseller is located"
-
+        description: "City where the reseller is located"
       - name: reseller_state
         type: categorical
-        description: "State or province where reseller is located"
-
+        description: "State/province where the reseller is located"
       - name: retail_category
         type: categorical
-        description: "Retail channel category (e.g., Specialty Retail, Volume Retail, Value Retail)"
-
+        description: "Retail category classification (Specialty Retail, Volume Retail, Value Retail, General Retail)"
       - name: geographic_tier
         type: categorical
-        description: "Geographic partnership tier (e.g., Domestic Partner, NAFTA Partner, International Partner)"
-
+        description: "Partner geographic tier (Domestic Partner, NAFTA Partner, International Partner)"
       - name: market_classification_detail
         type: categorical
-        description: "Detailed market classification (e.g., Major Market, Secondary Market, Tertiary Market)"
+        description: "Detailed market classification (Major Market, Secondary Market, Tertiary Market, International Market)"
 
+      # Strategic dimensions
       - name: market_penetration_potential
         type: categorical
-        description: "Assessment of market penetration potential (High, Medium, Limited)"
-
+        description: "Market penetration potential rating (High Potential, Medium Potential, Limited Potential)"
       - name: recommended_strategy
         type: categorical
-        description: "Recommended channel strategy based on partner and product fit"
+        description: "Recommended channel strategy based on product-reseller fit analysis"
 
+      # Time dimension
       - name: dbt_updated_at
         type: time
-        description: "Timestamp when record was last updated by dbt"
+        description: "Timestamp when the record was last updated"
         type_params:
           time_granularity: day
 
     measures:
+      # Product availability measures
       - name: total_products_in_territory
-        description: "Total count of distinct products available in the territory"
+        description: "Total number of distinct products available in the territory"
         agg: sum
         expr: total_products_in_territory
-
       - name: total_categories_in_territory
-        description: "Total count of distinct product categories in the territory"
+        description: "Total number of distinct product categories available in the territory"
         agg: sum
         expr: total_categories_in_territory
 
+      # Channel-product fit measures
       - name: specialty_premium_products
-        description: "Count of premium products suitable for specialty retail channels"
+        description: "Count of premium products suited for specialty retail channels"
         agg: sum
         expr: specialty_premium_products
-
       - name: warehouse_volume_products
-        description: "Count of standard/budget products suitable for warehouse volume retail"
+        description: "Count of standard/budget products suited for warehouse/volume retail channels"
         agg: sum
         expr: warehouse_volume_products
-
       - name: value_budget_products
-        description: "Count of budget products suitable for value retail channels"
+        description: "Count of budget products suited for value retail channels"
         agg: sum
         expr: value_budget_products
 
+      # Category availability measures
       - name: bikes_available
-        description: "Count of bike products available in territory"
+        description: "Number of bike products available in the territory"
         agg: sum
         expr: bikes_available
-
       - name: components_available
-        description: "Count of component products available in territory"
+        description: "Number of component products available in the territory"
         agg: sum
         expr: components_available
-
       - name: apparel_available
-        description: "Count of apparel products available in territory"
+        description: "Number of apparel products available in the territory"
         agg: sum
         expr: apparel_available
-
       - name: accessories_available
-        description: "Count of accessory products available in territory"
+        description: "Number of accessory products available in the territory"
         agg: sum
         expr: accessories_available
 
+      # Price tier measures
       - name: premium_products
-        description: "Count of premium price tier products"
+        description: "Count of premium tier products"
         agg: sum
         expr: premium_products
-
       - name: midrange_products
-        description: "Count of mid-range price tier products"
+        description: "Count of mid-range tier products"
         agg: sum
         expr: midrange_products
-
       - name: standard_products
-        description: "Count of standard price tier products"
+        description: "Count of standard tier products"
         agg: sum
         expr: standard_products
-
       - name: budget_products
-        description: "Count of budget price tier products"
+        description: "Count of budget tier products"
         agg: sum
         expr: budget_products
 
+      # Financial measures
       - name: avg_product_cost_in_territory
-        description: "Average product cost across all products in territory"
+        description: "Average product cost across all products in the territory"
         agg: avg
         expr: avg_product_cost_in_territory
-
       - name: total_inventory_value_potential
-        description: "Total potential inventory value for all products in territory"
+        description: "Total potential inventory value based on standard costs"
         agg: sum
         expr: total_inventory_value_potential
-
       - name: lowest_price_point
-        description: "Lowest product price point in territory"
+        description: "Lowest product price point in the territory"
         agg: min
         expr: lowest_price_point
-
       - name: highest_price_point
-        description: "Highest product price point in territory"
+        description: "Highest product price point in the territory"
         agg: max
         expr: highest_price_point
 
+      # Score measures
       - name: channel_product_fit_score
-        description: "Score indicating how well products fit the channel partner type (0-100 scale)"
+        description: "Score measuring how well the product mix fits the channel type (0-10 scale)"
         agg: avg
         expr: channel_product_fit_score
-
       - name: territory_competitiveness_score
-        description: "Overall territory competitiveness score based on product availability and market maturity (0-100 scale)"
+        description: "Overall territory competitiveness score based on product availability, value, and market maturity"
         agg: avg
         expr: territory_competitiveness_score
+
+      # Count measure for aggregations
+      - name: reseller_count
+        description: "Count of unique resellers"
+        agg: count_distinct
+        expr: reseller_id

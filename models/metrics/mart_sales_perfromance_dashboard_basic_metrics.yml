@@ -1,112 +1,132 @@
 metrics:
+  # Product Availability Metrics
   - name: total_products_available
     label: "Total Products Available"
-    description: "Total count of distinct products available to salespeople in their territories. Use to assess product portfolio breadth for sales teams."
+    description: "Total number of distinct products available to sales teams. Use this to measure product accessibility and sales enablement."
     type: simple
     type_params:
       measure: total_products_available
 
   - name: total_categories_available
     label: "Total Categories Available"
-    description: "Total count of distinct product categories available. Use to evaluate category diversification for sales planning."
+    description: "Number of distinct product categories available. Measures portfolio breadth and cross-sell opportunity."
     type: simple
     type_params:
       measure: total_categories_available
 
+  # Price Tier Metrics
   - name: premium_products_count
     label: "Premium Products Count"
-    description: "Count of premium price tier products. Use to track premium segment opportunities for sales teams."
+    description: "Count of premium tier products in the salesperson's portfolio. Use to assess high-margin selling opportunity."
     type: simple
     type_params:
       measure: premium_products_count
 
   - name: midrange_products_count
     label: "Mid-Range Products Count"
-    description: "Count of mid-range price tier products. Use to monitor mid-market sales opportunities."
+    description: "Count of mid-range tier products available. Tracks mainstream product availability for sales."
     type: simple
     type_params:
       measure: midrange_products_count
 
   - name: standard_products_count
     label: "Standard Products Count"
-    description: "Count of standard price tier products. Use to assess standard tier sales coverage."
+    description: "Count of standard tier products available. Measures core product line coverage."
     type: simple
     type_params:
       measure: standard_products_count
 
   - name: budget_products_count
     label: "Budget Products Count"
-    description: "Count of budget price tier products. Use to evaluate entry-level product sales potential."
+    description: "Count of budget tier products available. Tracks entry-level product availability for price-sensitive markets."
     type: simple
     type_params:
       measure: budget_products_count
 
+  # Category Breakdown Metrics
   - name: bikes_count
     label: "Bikes Count"
-    description: "Count of bike products available. Use to track bikes category sales opportunities."
+    description: "Number of bike products available. Key indicator of core product availability for sales."
     type: simple
     type_params:
       measure: bikes_count
 
   - name: components_count
     label: "Components Count"
-    description: "Count of component products available. Use to monitor components category depth for sales."
+    description: "Number of component products available. Indicates aftermarket and parts sales opportunity."
     type: simple
     type_params:
       measure: components_count
 
   - name: apparel_count
     label: "Apparel Count"
-    description: "Count of apparel products available. Use to track apparel category sales coverage."
+    description: "Number of apparel products available. Measures lifestyle category presence."
     type: simple
     type_params:
       measure: apparel_count
 
   - name: accessories_count
     label: "Accessories Count"
-    description: "Count of accessory products available. Use to assess accessories portfolio for sales."
+    description: "Number of accessory products available. Tracks add-on and upsell opportunity."
     type: simple
     type_params:
       measure: accessories_count
 
+  # Cost Metrics
   - name: avg_product_cost
     label: "Average Product Cost"
-    description: "Average product cost across all available products. Use to understand pricing dynamics for territory sales strategy."
+    description: "Average cost of available products. Use to understand price positioning and margin potential."
     type: simple
     type_params:
       measure: avg_product_cost
 
   - name: min_product_cost
     label: "Minimum Product Cost"
-    description: "Minimum product cost in available portfolio. Use to identify entry-level pricing for sales teams."
+    description: "Lowest priced product available. Use to understand entry-level pricing for customers."
     type: simple
     type_params:
       measure: min_product_cost
 
   - name: max_product_cost
     label: "Maximum Product Cost"
-    description: "Maximum product cost in available portfolio. Use to understand premium pricing ceiling for sales opportunities."
+    description: "Highest priced product available. Use to understand premium selling ceiling."
     type: simple
     type_params:
       measure: max_product_cost
 
   - name: total_inventory_value
     label: "Total Inventory Value"
-    description: "Total inventory value for all available products. Use to estimate potential revenue and market size for sales planning."
+    description: "Total inventory value at standard cost. Key metric for investment and working capital management."
     type: simple
     type_params:
       measure: total_inventory_value
 
   - name: avg_standard_cost
     label: "Average Standard Cost"
-    description: "Average standard cost of products. Use to analyze cost structure for sales margin planning."
+    description: "Average standard cost of products. Use for cost analysis and pricing decisions."
     type: simple
     type_params:
       measure: avg_standard_cost
 
+  # Performance Score Metrics
   - name: market_opportunity_score
     label: "Market Opportunity Score"
-    description: "Overall market opportunity score based on product diversity and market maturity (0-100 scale). Use to prioritize territory assignments and sales investments."
+    description: "Overall market opportunity score based on product diversity, value, and market maturity. Higher scores indicate greater sales potential."
     type: simple
     type_params:
       measure: market_opportunity_score
+
+  # Count Metrics
+  - name: salesperson_count
+    label: "Salesperson Count"
+    description: "Number of unique salespeople. Use to measure sales force coverage and capacity."
+    type: simple
+    type_params:
+      measure: salesperson_count
+
+  - name: territory_count
+    label: "Territory Count"
+    description: "Number of unique territories. Use to measure geographic coverage and market presence."
+    type: simple
+    type_params:
+      measure: territory_count

@@ -1,6 +1,6 @@
 semantic_models:
-  - name: mart_sales_perfromance_dashboard
-    description: "Comprehensive sales performance metrics by territory and salesperson with product portfolio analysis"
+  - name: sales_performance_dashboard
+    description: "Comprehensive sales performance metrics by territory and salesperson, including product portfolio analysis, cost metrics, and market opportunity scoring for sales planning and performance management."
     model: ref('mart_sales_perfromance_dashboard')
 
     defaults:
@@ -9,140 +9,139 @@ semantic_models:
     entities:
       - name: territory_key
         type: foreign
-        description: "Unique identifier for sales territory"
-
+        description: "Unique identifier for sales territories"
       - name: employee_key
         type: primary
-        description: "Unique identifier for salesperson employee"
+        description: "Unique identifier for sales employees/representatives"
 
     dimensions:
+      # Territory dimensions
       - name: region
         type: categorical
-        description: "Geographic sales region"
-
+        description: "Geographic region name (e.g., Northwest, Central, Southeast)"
       - name: country
         type: categorical
-        description: "Country name for territory"
-
+        description: "Country where the territory is located"
       - name: region_group
         type: categorical
         description: "High-level regional grouping (e.g., North America, Europe, Pacific)"
-
       - name: market_type
         type: categorical
-        description: "Market type classification (e.g., Domestic, NAFTA, International)"
-
+        description: "Market type classification (Domestic, NAFTA, International)"
       - name: regional_priority
         type: categorical
-        description: "Regional priority tier (High Priority, Medium Priority, Standard Priority)"
+        description: "Territory priority level (High Priority, Medium Priority, Standard Priority)"
 
+      # Salesperson dimensions
       - name: salesperson_name
         type: categorical
-        description: "Name of the salesperson"
-
+        description: "Full name of the sales representative"
       - name: job_title
         type: categorical
-        description: "Job title of the salesperson"
-
+        description: "Job title of the sales representative"
       - name: role_level
         type: categorical
-        description: "Role level classification (Executive, Management, Individual Contributor)"
-
+        description: "Organizational role level (Executive, Management, Individual Contributor, Other)"
       - name: territory_scope
         type: categorical
         description: "Scope of territory coverage (Regional Coverage, Multi-Territory, Limited Territory, Individual Territory)"
 
+      # Performance classification dimensions
       - name: product_diversity_level
         type: categorical
-        description: "Level of product diversity (High, Medium, Low Product Diversity)"
-
+        description: "Product diversity classification (High Product Diversity, Medium Product Diversity, Low Product Diversity)"
       - name: portfolio_positioning
         type: categorical
-        description: "Portfolio positioning strategy (Premium Portfolio, Mid-Range Portfolio, Value Portfolio)"
+        description: "Portfolio positioning based on average cost (Premium Portfolio, Mid-Range Portfolio, Value Portfolio)"
 
+      # Time dimension
       - name: dbt_updated_at
         type: time
-        description: "Timestamp when record was last updated by dbt"
+        description: "Timestamp when the record was last updated"
         type_params:
           time_granularity: day
 
     measures:
+      # Product availability measures
       - name: total_products_available
-        description: "Total count of distinct products available to salesperson in territory"
+        description: "Total number of distinct products available to the salesperson in their territory"
         agg: sum
         expr: total_products_available
-
       - name: total_categories_available
-        description: "Total count of distinct product categories available"
+        description: "Total number of distinct product categories available"
         agg: sum
         expr: total_categories_available
 
+      # Price tier product counts
       - name: premium_products_count
-        description: "Count of premium price tier products"
+        description: "Count of premium tier products in the portfolio"
         agg: sum
         expr: premium_products_count
-
       - name: midrange_products_count
-        description: "Count of mid-range price tier products"
+        description: "Count of mid-range tier products in the portfolio"
         agg: sum
         expr: midrange_products_count
-
       - name: standard_products_count
-        description: "Count of standard price tier products"
+        description: "Count of standard tier products in the portfolio"
         agg: sum
         expr: standard_products_count
-
       - name: budget_products_count
-        description: "Count of budget price tier products"
+        description: "Count of budget tier products in the portfolio"
         agg: sum
         expr: budget_products_count
 
+      # Category breakdown measures
       - name: bikes_count
-        description: "Count of bike products available"
+        description: "Number of bike products available"
         agg: sum
         expr: bikes_count
-
       - name: components_count
-        description: "Count of component products available"
+        description: "Number of component products available"
         agg: sum
         expr: components_count
-
       - name: apparel_count
-        description: "Count of apparel products available"
+        description: "Number of apparel products available"
         agg: sum
         expr: apparel_count
-
       - name: accessories_count
-        description: "Count of accessory products available"
+        description: "Number of accessory products available"
         agg: sum
         expr: accessories_count
 
+      # Cost metrics
       - name: avg_product_cost
         description: "Average product cost across all available products"
         agg: avg
         expr: avg_product_cost
-
       - name: min_product_cost
-        description: "Minimum product cost in available portfolio"
+        description: "Minimum product cost (lowest priced item)"
         agg: min
         expr: min_product_cost
-
       - name: max_product_cost
-        description: "Maximum product cost in available portfolio"
+        description: "Maximum product cost (highest priced item)"
         agg: max
         expr: max_product_cost
-
       - name: total_inventory_value
-        description: "Total inventory value for all available products"
+        description: "Total inventory value at standard cost"
         agg: sum
         expr: total_inventory_value
-
       - name: avg_standard_cost
         description: "Average standard cost of products"
         agg: avg
         expr: avg_standard_cost
 
+      # Performance score measures
       - name: market_opportunity_score
-        description: "Overall market opportunity score based on product diversity and market maturity (0-100 scale)"
+        description: "Market opportunity score (0-100+) based on product diversity, value, and market maturity"
         agg: avg
         expr: market_opportunity_score
+
+      # Count measures for aggregations
+      - name: salesperson_count
+        description: "Count of unique salespeople"
+        agg: count_distinct
+        expr: employee_key
+      - name: territory_count
+        description: "Count of unique territories"
+        agg: count_distinct
+        expr: territory_key

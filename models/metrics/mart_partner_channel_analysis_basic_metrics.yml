@@ -1,133 +1,147 @@
 metrics:
+  # Product Availability Metrics
   - name: total_products_in_territory
     label: "Total Products in Territory"
-    description: "Total count of distinct products available across territories. Use to assess product portfolio breadth and market coverage."
+    description: "Shows the total number of distinct products available within a territory. Use this metric to assess product availability and coverage across different regions."
     type: simple
     type_params:
       measure: total_products_in_territory
 
   - name: total_categories_in_territory
-    label: "Total Product Categories"
-    description: "Total count of distinct product categories in territories. Use to evaluate category diversification."
+    label: "Total Categories in Territory"
+    description: "Shows the number of distinct product categories available in a territory. Useful for measuring category diversity and portfolio breadth."
     type: simple
     type_params:
       measure: total_categories_in_territory
 
+  # Channel-Product Fit Metrics
   - name: specialty_premium_products
     label: "Specialty Premium Products"
-    description: "Count of premium products suitable for specialty retail channels. Use to identify premium channel opportunities."
+    description: "Count of premium products aligned with specialty retail channels. Use to evaluate product-channel fit for specialty partners."
     type: simple
     type_params:
       measure: specialty_premium_products
 
   - name: warehouse_volume_products
     label: "Warehouse Volume Products"
-    description: "Count of standard/budget products suitable for warehouse volume retail. Use to assess volume channel fit."
+    description: "Count of standard/budget products suited for high-volume warehouse channels. Use to assess volume retail opportunity."
     type: simple
     type_params:
       measure: warehouse_volume_products
 
   - name: value_budget_products
     label: "Value Budget Products"
-    description: "Count of budget products suitable for value retail channels. Use to evaluate value channel alignment."
+    description: "Count of budget-friendly products for value retail channels. Use to evaluate value channel opportunities."
     type: simple
     type_params:
       measure: value_budget_products
 
+  # Category Availability Metrics
   - name: bikes_available
     label: "Bikes Available"
-    description: "Count of bike products available in territories. Use to track bikes category availability."
+    description: "Number of bike products available in territory. Key indicator of core product availability."
     type: simple
     type_params:
       measure: bikes_available
 
   - name: components_available
     label: "Components Available"
-    description: "Count of component products available in territories. Use to monitor components category depth."
+    description: "Number of component products available. Indicates aftermarket and service opportunity."
     type: simple
     type_params:
       measure: components_available
 
   - name: apparel_available
     label: "Apparel Available"
-    description: "Count of apparel products available in territories. Use to track apparel category coverage."
+    description: "Number of apparel products available. Measures lifestyle and accessory category presence."
     type: simple
     type_params:
       measure: apparel_available
 
   - name: accessories_available
     label: "Accessories Available"
-    description: "Count of accessory products available in territories. Use to assess accessories portfolio size."
+    description: "Number of accessory products available. Tracks add-on and impulse purchase inventory."
     type: simple
     type_params:
       measure: accessories_available
 
+  # Price Tier Metrics
   - name: premium_products
     label: "Premium Products"
-    description: "Count of premium price tier products. Use to evaluate premium segment presence."
+    description: "Count of premium tier products. Use to assess high-margin product availability."
     type: simple
     type_params:
       measure: premium_products
 
   - name: midrange_products
     label: "Mid-Range Products"
-    description: "Count of mid-range price tier products. Use to track mid-market portfolio."
+    description: "Count of mid-range tier products. Tracks mainstream product availability."
     type: simple
     type_params:
       measure: midrange_products
 
   - name: standard_products
     label: "Standard Products"
-    description: "Count of standard price tier products. Use to assess standard tier availability."
+    description: "Count of standard tier products. Measures core product line coverage."
     type: simple
     type_params:
       measure: standard_products
 
   - name: budget_products
     label: "Budget Products"
-    description: "Count of budget price tier products. Use to monitor entry-level product offerings."
+    description: "Count of budget tier products. Tracks entry-level product availability."
     type: simple
     type_params:
       measure: budget_products
 
+  # Financial Metrics
   - name: avg_product_cost_in_territory
     label: "Average Product Cost"
-    description: "Average product cost across all products in territory. Use to understand territory pricing dynamics."
+    description: "Average cost of products in the territory. Use to understand price positioning and margin potential."
     type: simple
     type_params:
       measure: avg_product_cost_in_territory
 
   - name: total_inventory_value_potential
     label: "Total Inventory Value Potential"
-    description: "Total potential inventory value for all products in territory. Use to estimate market value and opportunity size."
+    description: "Total potential inventory value at standard cost. Key metric for investment and working capital planning."
     type: simple
     type_params:
       measure: total_inventory_value_potential
 
   - name: lowest_price_point
     label: "Lowest Price Point"
-    description: "Lowest product price point in territory. Use to identify entry-level pricing."
+    description: "Minimum product price in the territory. Use to understand entry-level pricing."
     type: simple
     type_params:
       measure: lowest_price_point
 
   - name: highest_price_point
     label: "Highest Price Point"
-    description: "Highest product price point in territory. Use to understand premium pricing ceiling."
+    description: "Maximum product price in the territory. Use to understand premium pricing ceiling."
     type: simple
     type_params:
       measure: highest_price_point
 
+  # Score Metrics
   - name: channel_product_fit_score
     label: "Channel Product Fit Score"
-    description: "Score indicating how well products fit the channel partner type (0-100 scale). Use to optimize channel-product alignment."
+    description: "Score measuring alignment between product mix and channel type. Higher scores indicate better fit."
     type: simple
     type_params:
       measure: channel_product_fit_score
 
   - name: territory_competitiveness_score
     label: "Territory Competitiveness Score"
-    description: "Overall territory competitiveness score based on product availability and market maturity (0-100 scale). Use to prioritize territory investments."
+    description: "Overall territory competitiveness based on product availability, value, and market maturity. Use for territory prioritization."
     type: simple
     type_params:
       measure: territory_competitiveness_score
+
+  # Count Metrics
+  - name: reseller_count
+    label: "Reseller Count"
+    description: "Number of unique reseller partners. Use to measure channel coverage and partner density."
+    type: simple
+    type_params:
+      measure: reseller_count
